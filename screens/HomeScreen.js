@@ -1,14 +1,25 @@
 import { Image, SafeAreaView, Text, TextInput, TouchableOpacity, View, Platform, StatusBar, ScrollView } from "react-native";
 import { theme } from "../themes";
-import { CalendarDaysIcon, MagnifyingGlassIcon, MapPinIcon} from 'react-native-heroicons/outline'
-import { useState } from "react";
+import { CalendarDaysIcon, MagnifyingGlassIcon} from 'react-native-heroicons/outline'
+import { MapPinIcon } from 'react-native-heroicons/solid'
+import { useCallback, useState } from "react";
+import { debounce } from 'lodash'
+import { fetchLocations } from "../api/weather";
 export default function HomeScreen() {
-    const [showSearch, toggleSearch ] = useState(false);
-    const [locations, setLocations] = ([1,2,3]);
-
+    const [showSearch, toggleSearch ] = useState(true);
+    const [locations, setLocations] = useState([]);
+    
     const handleLocation = (loc) =>{
         console.log(loc)
     }
+    const handleSearch = value=>{
+        // fetch locations
+        fetchLocations({cityName: value}).then(data=>{
+            console.log('got locations: ',data)
+            setLocations(data);
+        })
+    }
+    const handleTextDebounce = useCallback(debounce(handleSearch, 1200),[])
     return(
         <View className=' flex flex-1 relative'>
             <Image blurRadius={50} source={require('../assets/images/bg.png')} className='absolute h-full w-full' />
@@ -16,12 +27,14 @@ export default function HomeScreen() {
 
                 {/* search location */}
                 <View style={{height:'7%'}} className='mx-4 relative z-50'>
-                    <View className='flex-row justify-end items-center rounded-full' 
+                    <View className='flex-row justify-between items-center rounded-full' 
                     style={{backgroundColor: showSearch ?theme.bgWhite(0.2):'transparent'}} >
                         {
                             showSearch ?(
-                                <TextInput placeholder="Search city" placeholderTextColor={'light gray'}
-                        className='pl-6 h-10 text-base text-white'/>
+                                <TextInput
+                                onChangeText={handleTextDebounce}
+                                placeholder="Search city" placeholderTextColor={'light gray'}
+                        className='pl-6 h-10 pb-1 text-base text-white'/>
                             ):null
                         }
                         <TouchableOpacity
@@ -38,7 +51,7 @@ export default function HomeScreen() {
                                     locations.map((loc,index)=>{
                                         let showBorder = index+1 !=locations.length;
                                         let borderClass = showBorder ? 'border-b-2 border-b-gray-400':''
-                                        return(<TouchableOpacity key={index} className={borderClass+'flex-row items-center border-0 p-3 px-4 mb-1'}
+                                        return(<TouchableOpacity key={index} className={'flex-row items-center border-0 p-3 px-4 mb-1'+borderClass}
                                             onPress={()=>handleLocation(loc)}
                                         >
                                             <MapPinIcon size='20' color='gray'/>
