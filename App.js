@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Hello Chaitanya,xyz Realme. I don't know what i am typing but i am typing because i need to type. Do i need to type more, I don't know</Text>
+      <Text>Hello</Text>
       <StatusBar style="auto" />
     </SafeAreaView>
   );
